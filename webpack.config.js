@@ -11,7 +11,7 @@ module.exports = {
   },
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -28,7 +28,6 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist/docs'),
     host: 'localhost',
     inline: true,
-    info: false,
   },
 
   plugins: [

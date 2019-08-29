@@ -5,7 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 as of release version 2.1.0.
 
-## [Unreleased]
+## [5.0.0]
+
+### Changed
+- Updated dependencies and removed audit errors (@paulinfrancis and @g4ther)
+- Changed componentWillReceiveProps to getDerivedStateFromProps (@paulinfrancis)
+
+## [Unknown] - These were before we forked the library and are unsure of the status
 
 ### Added
 - Add props documentation to README.md
