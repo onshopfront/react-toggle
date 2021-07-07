@@ -1,8 +1,8 @@
-var CopyWebpackPlugin = require('copy-webpack-plugin')
-var path = require('path')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const path = require('path')
 
 module.exports = {
-  entry: path.join(__dirname, 'src/docs/index.js'),
+  entry: path.join(__dirname, 'src/docs/index.tsx'),
   devtool: 'source-map',
 
   output: {
@@ -10,29 +10,34 @@ module.exports = {
     filename: 'bundle.js',
   },
 
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+  },
+
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.[jt]s(x?)$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
       },
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader',
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },
 
   devServer: {
-    contentBase: path.join(__dirname, 'dist/docs'),
+    static: [path.join(__dirname, 'dist/docs')],
     host: 'localhost',
-    inline: true,
   },
 
   plugins: [
-    new CopyWebpackPlugin([
-      { from: path.join(__dirname, 'src/docs/index.html') },
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: path.join(__dirname, 'src/docs/index.html') },
+      ],
+    }),
   ],
 }

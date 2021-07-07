@@ -1,70 +1,68 @@
 {
-  "name": "@shopfront/react-toggle",
-  "version": "5.0.0",
-  "description": "An elegant, accessible toggle component for React. Also a glorified checkbox.",
-  "main": "dist/component/index.js",
-  "style": "src/style.css",
-  "scripts": {
-    "prepublish": "npm run build && cp -rv dist/docs/* docs/",
-    "build-component": "babel src/component --out-dir dist/component",
-    "build-docs": "webpack",
-    "build": "npm run build-component && npm run build-docs",
-    "test": "nyc mocha --require @babel/register --require spec/setup.js spec/**/*.spec.js",
-    "lint": "eslint .; exit 0",
-    "dev": "webpack-dev-server"
-  },
-  "keywords": [
-    "toggle",
-    "component",
-    "react",
-    "react-component"
-  ],
-  "author": "Shopfront <api@shopfront.com.au>",
-  "homepage": "https://github.com/onshopfront/react-toggle",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:onshopfront/react-toggle.git"
-  },
-  "bugs": {
-    "url": "https://github.com/onshopfront/react-toggle/issues"
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "@babel/preset-react": "^7.0.0",
-    "@babel/register": "^7.5.5",
-    "babel-loader": "^8.0.6",
-    "chai": "^4.2.0",
-    "chai-enzyme": "^1.0.0-beta.1",
-    "copy-webpack-plugin": "^5.0.4",
-    "css-loader": "^3.2.0",
-    "enzyme": "^3.9.0",
-    "enzyme-adapter-react-16": "^1.13.0",
-    "eslint": "^3.7.1",
-    "eslint-config-standard": "^6.2.0",
-    "eslint-config-standard-react": "^4.2.0",
-    "eslint-plugin-promise": "^2.0.1",
-    "eslint-plugin-react": "^6.3.0",
-    "eslint-plugin-standard": "^2.0.1",
-    "jsdom": "^15.1.0",
-    "mocha": "^6.1.4",
-    "nyc": "^14.1.1",
-    "prop-types": "^15.7.2",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "style-loader": "^0.13.1",
-    "webpack": "^4.39.3",
-    "webpack-cli": "^3.3.7",
-    "webpack-dev-server": "^3.8.0"
-  },
-  "dependencies": {
-    "classnames": "^2.2.5"
-  },
-  "peerDependencies": {
-    "prop-types": "^15.3.0 || ^16.0.0",
-    "react": "^16.4.0",
-    "react-dom": "^16.4.0"
-  }
+    "name": "@shopfront/react-toggle",
+    "version": "6.0.0",
+    "description": "An elegant, accessible toggle component for React. Also a glorified checkbox.",
+    "main": "dist/component/index.js",
+    "style": "style.css",
+    "scripts": {
+        "prepublish": "npm run build",
+        "build-component": "tsc",
+        "build-docs": "webpack --mode=production",
+        "build": "npm run build-component && npm run build-docs",
+        "test": "npm run build-component && nyc mocha --require @babel/register --require spec/setup.js spec/**/*.spec.js",
+        "lint": "eslint .; exit 0",
+        "dev": "webpack serve --mode=development"
+    },
+    "keywords": [
+        "toggle",
+        "component",
+        "react",
+        "react-component"
+    ],
+    "author": "Shopfront <api@shopfront.com.au>",
+    "homepage": "https://github.com/onshopfront/react-toggle",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:onshopfront/react-toggle.git"
+    },
+    "bugs": {
+        "url": "https://github.com/onshopfront/react-toggle/issues"
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "@babel/cli": "^7.14.5",
+        "@babel/core": "^7.14.6",
+        "@babel/preset-env": "^7.14.7",
+        "@babel/preset-react": "^7.14.5",
+        "@babel/preset-typescript": "^7.14.5",
+        "@babel/register": "^7.14.5",
+        "@types/react": "^17.0.13",
+        "@types/react-dom": "^17.0.8",
+        "babel-loader": "^8.2.2",
+        "chai": "^4.3.4",
+        "chai-enzyme": "^1.0.0-beta.1",
+        "copy-webpack-plugin": "^9.0.1",
+        "css-loader": "^5.2.6",
+        "enzyme": "^3.11.0",
+        "enzyme-adapter-react-16": "^1.15.6",
+        "eslint": "^7.30.0",
+        "eslint-config-standard": "^16.0.3",
+        "eslint-config-standard-react": "^11.0.1",
+        "eslint-plugin-promise": "^5.1.0",
+        "eslint-plugin-react": "^7.24.0",
+        "jsdom": "^16.6.0",
+        "mocha": "^9.0.2",
+        "nyc": "^15.1.0",
+        "react": "^16.14.0",
+        "react-dom": "^16.14.0",
+        "style-loader": "^3.0.0",
+        "typescript": "^4.3.5",
+        "webpack": "^5.43.0",
+        "webpack-cli": "^4.7.2",
+        "webpack-dev-server": "^4.0.0-beta.3"
+    },
+    "peerDependencies": {
+        "react": "^16.4.0",
+        "react-dom": "^16.4.0"
+    }
 }

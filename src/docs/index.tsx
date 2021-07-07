@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
 
-import Toggle from '../component'
+import Toggle from '../component/index'
 // In your code this would be:
 // import Toggle from 'react-toggle'
 
@@ -19,8 +19,36 @@ const Heart = () => (
   </div>
 )
 
-class App extends Component {
-  constructor (props) {
+interface State {
+  aubergineIsReady: boolean;
+  cheeseIsReady: boolean;
+  baconIsReady: boolean;
+  biscuitIsReady: boolean;
+  milkIsReady: boolean;
+  eggsAreReady: boolean;
+  soupIsReady: boolean;
+  tofuIsReady: boolean;
+  burritoIsReady: boolean;
+  toastIsReady: boolean;
+  formData: {};
+}
+
+class App extends Component<{}, State> {
+  public static displayName = "App";
+
+  protected handleSoupChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  protected handleTofuChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  protected handleEggsChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  protected handleBaconChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  protected handleToastChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  protected handleCheeseChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  protected handleBiscuitChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  protected handleBurritoChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  protected handleAubergineChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+
+  protected breakfastForm = React.createRef<HTMLFormElement>();
+
+  constructor (props: {}) {
     super(props)
     this.handleMilkChange = this.handleMilkChange.bind(this)
     this.handleSoupChange = this.handleChange.bind(this, 'soupIsReady')
@@ -48,18 +76,24 @@ class App extends Component {
     }
   }
 
-  handleChange (key, event) {
-    this.setState({ [key]: event.target.checked })
+  handleChange (key: string, event: React.ChangeEvent<HTMLInputElement>) {
+    this.setState({
+      [key as "aubergineIsReady"]: event.target.checked
+    })
   }
 
   handleMilkChange () {
-    const form = this.refs.breakfastForm
+    const form = this.breakfastForm.current;
+    if(!form) {
+      return;
+    }
+
     this.setState({formData: form.milkIsReady.checked ? {milkIsReady: form.milkIsReady.value} : {}})
   }
 
   render () {
     return (
-      <form ref='breakfastForm'>
+      <form ref={this.breakfastForm}>
         <h1>react-toggle</h1>
 
         {/* Installation */}
@@ -367,7 +401,5 @@ class App extends Component {
     )
   }
 }
-
-App.displayName = 'App'
 
 render(<App />, document.getElementById('application'))

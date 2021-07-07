@@ -1,13 +1,48 @@
 import React, { PureComponent } from 'react'
-import classNames from 'classnames'
-import PropTypes from 'prop-types'
 import Check from './check'
 import X from './x'
 import { pointerCoord } from './util'
 
-export default class Toggle extends PureComponent {
+interface Props {
+  checked: boolean,
+  disabled: boolean,
+  defaultChecked: boolean,
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFocus: (e: React.FocusEvent) => void;
+  onBlur: (e: React.FocusEvent) => void;
+  className: string;
+  name: string;
+  value: string;
+  id: string;
+  "aria-labelledby": string;
+  "aria-label": string;
+  icons: false | {
+    checked: React.ReactNode,
+    unchecked: React.ReactNode,
+  }
+}
 
-  static getDerivedStateFromProps (nextProps) {
+interface State {
+  checked: boolean;
+  hasFocus: boolean;
+}
+
+export default class Toggle extends PureComponent<Partial<Props>, State> {
+  public static displayName = "Toggle";
+  public static defaultProps = {
+    icons: {
+      checked: <Check />,
+      unchecked: <X />,
+    },
+  }
+
+  protected previouslyChecked: boolean;
+  protected inputRef = React.createRef<HTMLInputElement>();
+  protected moved = false;
+  protected startX: null | number = null;
+  protected activated = false;
+
+  static getDerivedStateFromProps (nextProps: Partial<Props>) {
     if ('checked' in nextProps) {
       return { checked: !!nextProps.checked }
     }
@@ -15,7 +50,7 @@ export default class Toggle extends PureComponent {
     return null
   }
 
-  constructor (props) {
+  constructor (props: Partial<Props>) {
     super(props)
     this.handleClick = this.handleClick.bind(this)
     this.handleTouchStart = this.handleTouchStart.bind(this)
@@ -30,8 +65,9 @@ export default class Toggle extends PureComponent {
     }
   }
 
-  handleClick (event) {
-    const checkbox = this.input
+  handleClick (event: React.MouseEvent) {
+    const checkbox = this.inputRef.current
+    if(!checkbox) return
     if (event.target !== checkbox && !this.moved) {
       this.previouslyChecked = checkbox.checked
       event.preventDefault()
@@ -40,17 +76,17 @@ export default class Toggle extends PureComponent {
       return
     }
 
-    const checked = this.props.hasOwnProperty('checked') ? this.props.checked : checkbox.checked
+    const checked = this.props.hasOwnProperty('checked') ? !!this.props.checked : checkbox.checked
 
     this.setState({checked})
   }
 
-  handleTouchStart (event) {
+  handleTouchStart (event: React.TouchEvent) {
     this.startX = pointerCoord(event).x
     this.activated = true
   }
 
-  handleTouchMove (event) {
+  handleTouchMove (event: React.TouchEvent) {
     if (!this.activated) return
     this.moved = true
 
@@ -68,14 +104,15 @@ export default class Toggle extends PureComponent {
     }
   }
 
-  handleTouchEnd (event) {
+  handleTouchEnd (event: React.TouchEvent) {
     if (!this.moved) return
-    const checkbox = this.input
+    const checkbox = this.inputRef.current
+    if(!checkbox) return
     event.preventDefault()
 
     if (this.startX) {
       let endX = pointerCoord(event).x
-      if (this.previouslyChecked === true && this.startX + 4 > endX) {
+      if (this.previouslyChecked && this.startX + 4 > endX) {
         if (this.previouslyChecked !== this.state.checked) {
           this.setState({ checked: false })
           this.previouslyChecked = this.state.checked
@@ -95,7 +132,7 @@ export default class Toggle extends PureComponent {
     }
   }
 
-  handleFocus (event) {
+  handleFocus (event: React.FocusEvent) {
     const { onFocus } = this.props
 
     if (onFocus) {
@@ -105,7 +142,7 @@ export default class Toggle extends PureComponent {
     this.setState({ hasFocus: true })
   }
 
-  handleBlur (event) {
+  handleBlur (event: React.FocusEvent) {
     const { onBlur } = this.props
 
     if (onBlur) {
@@ -115,30 +152,46 @@ export default class Toggle extends PureComponent {
     this.setState({ hasFocus: false })
   }
 
-  getIcon (type) {
+  getIcon (type: "checked" | "unchecked") {
     const { icons } = this.props
     if (!icons) {
       return null
     }
-    return icons[type] === undefined
+    return typeof icons[type] === undefined
       ? Toggle.defaultProps.icons[type]
       : icons[type]
   }
 
   render () {
     const { className, icons: _icons, ...inputProps } = this.props
-    const classes = classNames('react-toggle', {
-      'react-toggle--checked': this.state.checked,
-      'react-toggle--focus': this.state.hasFocus,
-      'react-toggle--disabled': this.props.disabled,
-    }, className)
+
+    const classes = [
+        "react-toggle",
+    ];
+
+    if(this.state.checked) {
+      classes.push("react-toggle--checked");
+    }
+
+    if(this.state.hasFocus) {
+      classes.push("react-toggle--focus");
+    }
+
+    if(this.props.disabled) {
+      classes.push("react-toggle--disabled");
+    }
+
+    if(className) {
+      classes.push(className);
+    }
 
     return (
-      <div className={classes}
+      <div className={classes.join(" ")}
         onClick={this.handleClick}
         onTouchStart={this.handleTouchStart}
         onTouchMove={this.handleTouchMove}
-        onTouchEnd={this.handleTouchEnd}>
+        onTouchEnd={this.handleTouchEnd}
+      >
         <div className='react-toggle-track'>
           <div className='react-toggle-track-check'>
             {this.getIcon('checked')}
@@ -151,7 +204,7 @@ export default class Toggle extends PureComponent {
 
         <input
           {...inputProps}
-          ref={ref => { this.input = ref }}
+          ref={this.inputRef}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
           className='react-toggle-screenreader-only'
@@ -159,35 +212,4 @@ export default class Toggle extends PureComponent {
       </div>
     )
   }
-}
-
-Toggle.displayName = 'Toggle'
-
-Toggle.defaultProps = {
-  icons: {
-    checked: <Check />,
-    unchecked: <X />,
-  },
-}
-
-Toggle.propTypes = {
-  checked: PropTypes.bool,
-  disabled: PropTypes.bool,
-  defaultChecked: PropTypes.bool,
-  onChange: PropTypes.func,
-  onFocus: PropTypes.func,
-  onBlur: PropTypes.func,
-  className: PropTypes.string,
-  name: PropTypes.string,
-  value: PropTypes.string,
-  id: PropTypes.string,
-  'aria-labelledby': PropTypes.string,
-  'aria-label': PropTypes.string,
-  icons: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.shape({
-      checked: PropTypes.node,
-      unchecked: PropTypes.node,
-    }),
-  ]),
 }
