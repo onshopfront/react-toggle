@@ -1,15 +1,12 @@
 /* eslint-disable no-unused-expressions */
 // eslint-disable-next-line no-unused-vars
 import React from 'react'
-import chai, { expect } from 'chai'
-import chaiEnzyme from 'chai-enzyme'
+// eslint-disable-next-line no-unused-vars
 import Toggle from '../dist/component'
-import Enzyme, { shallow, mount } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
-
-Enzyme.configure({ adapter: new Adapter() })
+import { render, screen, fireEvent } from '@testing-library/react'
 
 const noop = () => {}
+
 const classNames = {
   base: 'react-toggle',
   focus: 'react-toggle--focus',
@@ -17,245 +14,285 @@ const classNames = {
   disabled: 'react-toggle--disabled',
 }
 
-chai.use(chaiEnzyme())
-
 describe('Component', () => {
-  let wrapper
   const className = 'foobar'
 
-  it('sets state/input-value based on `checked`-prop', () => {
-    wrapper = shallow(
+  test('sets state/input-value based on `checked`-prop', () => {
+    const { rerender } = render(
       <Toggle
         onChange={noop}
         checked={false}
       />,
     )
 
-    expect(wrapper.state('checked')).to.be.false
-    expect(wrapper.find('input')).to.not.be.checked()
+    expect(screen.getByRole('checkbox')).not.toBeChecked()
 
-    wrapper.setProps({ checked: true })
-
-    expect(wrapper.state('checked')).to.be.true
-    expect(wrapper.find('input')).to.be.checked()
-  })
-
-  it('accepts a className as a prop', () => {
-    wrapper = shallow(<Toggle className={className} />)
-
-    expect(wrapper.hasClass(className)).to.be.true
-  })
-
-  it('does not pass the custom className to the checkbox', () => {
-    wrapper = shallow(<Toggle className={className} />)
-
-    expect(wrapper.find('input').hasClass(className)).to.be.false
-  })
-
-  it('defaults to the value of `defaultChecked`', () => {
-    wrapper = shallow(<Toggle defaultChecked={false} />)
-
-    expect(wrapper.state('checked')).to.be.false
-    expect(wrapper.find('input')).to.not.be.checked()
-
-    wrapper = shallow(<Toggle defaultChecked />)
-
-    expect(wrapper.state('checked')).to.be.true
-    expect(wrapper.find('input')).to.be.checked()
-  })
-
-  it('will hide icons if set false', () => {
-    wrapper = shallow(<Toggle icons={false} />)
-
-    expect(wrapper.find('.react-toggle-track-check')).to.be.empty
-    expect(wrapper.find('.react-toggle-track-x')).to.be.empty
-
-    wrapper = shallow(<Toggle />)
-
-    expect(wrapper.find('.react-toggle-track-check')).to.not.be.empty
-    expect(wrapper.find('.react-toggle-track-x')).to.not.be.empty
-  })
-
-  it('takes custom icons', () => {
-    const checked = <div>checked</div>
-    const unchecked = <div>unchecked</div>
-    wrapper = shallow(<Toggle icons={{ checked, unchecked }} />)
-
-    expect(wrapper.find('.react-toggle-track-check')).to.be.contain(checked)
-    expect(wrapper.find('.react-toggle-track-x')).to.be.contain(unchecked)
-  })
-
-  it('defaults to the regular icon if only one is supplied', () => {
-    const checked = <div>checked</div>
-    const unchecked = <div>unchecked</div>
-    const { icons: defaults } = Toggle.defaultProps
-    wrapper = shallow(<Toggle icons={{ checked }} />)
-
-    expect(wrapper.find('.react-toggle-track-check')).to.be.contain(checked)
-    expect(wrapper.find('.react-toggle-track-x')).to.be.contain(defaults.unchecked)
-    expect(defaults.unchecked).to.exist
-
-    wrapper = shallow(<Toggle icons={{ unchecked }} />)
-
-    expect(wrapper.find('.react-toggle-track-check')).to.be.contain(defaults.checked)
-    expect(wrapper.find('.react-toggle-track-x')).to.be.contain(unchecked)
-    expect(defaults.checked).to.exist
-  })
-
-  it('does not render icon.un-/checked if null', () => {
-    const element = <div>random</div>
-    wrapper = shallow(<Toggle icons={{ checked: element, unchecked: null }} />)
-
-    expect(wrapper.find('.react-toggle-track-check')).to.be.contain(element)
-    expect(wrapper.find('.react-toggle-track-x')).to.be.empty
-
-    wrapper = shallow(<Toggle icons={{ checked: null, unchecked: element }} />)
-
-    expect(wrapper.find('.react-toggle-track-check')).to.be.empty
-    expect(wrapper.find('.react-toggle-track-x')).to.be.contain(element)
-  })
-
-  it('uses correct classNames based on state', () => {
-    wrapper = shallow(<Toggle />)
-
-    wrapper.setState({ checked: false, hasFocus: false })
-    expect(wrapper.hasClass(classNames.base)).to.be.true
-    expect(wrapper.hasClass(classNames.focus)).to.be.false
-    expect(wrapper.hasClass(classNames.checked)).to.be.false
-    expect(wrapper.hasClass(classNames.disabled)).to.be.false
-
-    wrapper.setState({ checked: true, hasFocus: false })
-    expect(wrapper.hasClass(classNames.base)).to.be.true
-    expect(wrapper.hasClass(classNames.focus)).to.be.false
-    expect(wrapper.hasClass(classNames.checked)).to.be.true
-    expect(wrapper.hasClass(classNames.disabled)).to.be.false
-
-    wrapper.setState({ checked: false, hasFocus: true })
-    expect(wrapper.hasClass(classNames.base)).to.be.true
-    expect(wrapper.hasClass(classNames.focus)).to.be.true
-    expect(wrapper.hasClass(classNames.checked)).to.be.false
-    expect(wrapper.hasClass(classNames.disabled)).to.be.false
-
-    wrapper.setState({ checked: true, hasFocus: true })
-    expect(wrapper.hasClass(classNames.base)).to.be.true
-    expect(wrapper.hasClass(classNames.focus)).to.be.true
-    expect(wrapper.hasClass(classNames.checked)).to.be.true
-    expect(wrapper.hasClass(classNames.disabled)).to.be.false
-  })
-
-  it('tests toggle on click', () => {
-    wrapper = mount(
+    rerender(
       <Toggle
         onChange={noop}
+        checked={true}
       />,
     )
 
-    expect(wrapper.find('input')).to.not.be.checked()
-    wrapper.find('.react-toggle').simulate('click')
-    expect(wrapper.find('input')).to.be.checked()
-    wrapper.find('.react-toggle').simulate('click')
-    expect(wrapper.find('input')).to.not.be.checked()
+    expect(screen.getByRole('checkbox')).toBeChecked()
   })
 
-  it('tests onChange callback', () => {
-    let called = false
-    const changeHandler = () => {
-      called = true
-    }
-    wrapper = mount(
+  test('accepts a className as a prop', () => {
+    render(<Toggle className={className}/>)
+
+    expect(screen.getByTestId('toggle-wrapper')).toHaveClass(className)
+  })
+
+  test('does not pass the custom className to the checkbox', () => {
+    render(<Toggle className={className}/>)
+
+    expect(screen.getByRole('checkbox')).not.toHaveClass(className)
+  })
+
+  test('will handle `defaultChecked` being false', () => {
+    render(
       <Toggle
-        onChange={changeHandler}
+        defaultChecked={false}
       />,
     )
-    const input = wrapper.find('input')
-    expect(called).to.equal(false)
-    input.simulate('change')
-    expect(called).to.equal(true)
+
+    expect(screen.getByRole('checkbox')).not.toBeChecked()
   })
 
-  it('tests onBlur callback', () => {
-    let called = false
-    const blurHandler = () => {
-      called = true
-    }
-    const wrapper = mount(
+  test('will handle `defaultChecked` being true', () => {
+    render(
       <Toggle
-        onChange={noop}
-        onBlur={blurHandler} />,
+        defaultChecked
+      />,
     )
 
-    const input = wrapper.find('input')
-    expect(called).to.equal(false)
-    input.simulate('blur')
-    expect(called).to.equal(true)
+    expect(screen.getByRole('checkbox')).toBeChecked()
   })
 
-  it('tests onFocus callback', () => {
-    let called = false
-    const focusHandler = () => {
-      called = true
-    }
-    const wrapper = mount(
+  test('will hide icons if set false', () => {
+    const { rerender } = render(<Toggle icons={false} />)
+
+    expect(screen.getByTestId('toggle-track-check')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('toggle-track-x')).toBeEmptyDOMElement()
+
+    rerender(<Toggle/>)
+
+    expect(screen.getByTestId('toggle-track-check')).not.toBeEmptyDOMElement()
+    expect(screen.getByTestId('toggle-track-x')).not.toBeEmptyDOMElement()
+  })
+
+  test('takes custom icons', () => {
+    const checked = 'checked'
+    const unchecked = 'unchecked'
+
+    render(
+      <Toggle
+        icons={{
+          checked,
+          unchecked,
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId('toggle-track-check')).toContainHTML(checked)
+    expect(screen.getByTestId('toggle-track-x')).toContainHTML(unchecked)
+  })
+
+  test('defaults to the regular icon if only one is supplied', () => {
+    const checked = 'checked'
+    const unchecked = 'unchecked'
+
+    const { rerender } = render(<Toggle icons={{ checked }}/>)
+
+    expect(screen.getByTestId('toggle-track-check')).toContainHTML(checked)
+    expect(screen.getByTestId('toggle-track-x')).not.toContainHTML(unchecked)
+
+    rerender(<Toggle icons={{ unchecked }}/>)
+
+    expect(screen.getByTestId('toggle-track-check')).not.toContainHTML(checked)
+    expect(screen.getByTestId('toggle-track-x')).toContainHTML(unchecked)
+  })
+
+  test('does not render icon.un-/checked if null', () => {
+    const checked = 'checked'
+    const unchecked = 'unchecked'
+
+    const { rerender } = render(
+      <Toggle
+        icons={{
+          checked,
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId('toggle-track-check')).toContainHTML(checked)
+    expect(screen.getByTestId('toggle-track-x')).not.toContainHTML(unchecked)
+
+    rerender(<Toggle icons={{ unchecked }}/>)
+
+    expect(screen.getByTestId('toggle-track-check')).not.toContainHTML(checked)
+    expect(screen.getByTestId('toggle-track-x')).toContainHTML(unchecked)
+  })
+
+  test('uses correct classNames based on state', () => {
+    render(<Toggle/>)
+
+    const wrapper = screen.getByTestId('toggle-wrapper')
+    const checkbox = screen.getByRole('checkbox')
+
+    expect(wrapper).toHaveClass(classNames.base)
+    expect(wrapper).not.toHaveClass(classNames.focus)
+    expect(wrapper).not.toHaveClass(classNames.checked)
+    expect(wrapper).not.toHaveClass(classNames.disabled)
+
+    fireEvent.click(wrapper)
+    fireEvent.blur(checkbox)
+
+    expect(wrapper).toHaveClass(classNames.base)
+    expect(wrapper).not.toHaveClass(classNames.focus)
+    expect(wrapper).toHaveClass(classNames.checked)
+    expect(wrapper).not.toHaveClass(classNames.disabled)
+
+    fireEvent.focus(checkbox)
+
+    expect(wrapper).toHaveClass(classNames.base)
+    expect(wrapper).toHaveClass(classNames.focus)
+    expect(wrapper).toHaveClass(classNames.checked)
+    expect(wrapper).not.toHaveClass(classNames.disabled)
+
+    fireEvent.click(wrapper)
+
+    expect(wrapper).toHaveClass(classNames.base)
+    expect(wrapper).toHaveClass(classNames.focus)
+    expect(wrapper).not.toHaveClass(classNames.checked)
+    expect(wrapper).not.toHaveClass(classNames.disabled)
+  })
+
+  test('tests toggle on click', () => {
+    render(<Toggle/>)
+
+    const checkbox = screen.getByRole('checkbox')
+
+    expect(checkbox).not.toBeChecked()
+    fireEvent.click(screen.getByTestId('toggle-wrapper'))
+    expect(checkbox).toBeChecked()
+    fireEvent.click(screen.getByTestId('toggle-wrapper'))
+    expect(checkbox).not.toBeChecked()
+  })
+
+  test('tests onChange callback', () => {
+    const changeHandler = jest.fn()
+
+    render(
+      <Toggle
+        onChange={() => {
+          changeHandler()
+        }}
+      />,
+    )
+
+    expect(changeHandler).toHaveBeenCalledTimes(0)
+    fireEvent.click(screen.getByRole('checkbox'))
+    expect(changeHandler).toHaveBeenCalledTimes(1)
+  })
+
+  test('tests onBlur callback', () => {
+    const blurHandler = jest.fn()
+
+    render(
+      <Toggle
+        onChange={noop}
+        onBlur={blurHandler}
+      />,
+    )
+
+    expect(blurHandler).toHaveBeenCalledTimes(0)
+    fireEvent.blur(screen.getByRole('checkbox'))
+    expect(blurHandler).toHaveBeenCalledTimes(1)
+  })
+
+  test('tests onFocus callback', () => {
+    const focusHandler = jest.fn()
+
+    render(
       <Toggle
         onChange={noop}
         onFocus={focusHandler}
       />,
     )
 
-    const input = wrapper.find('input')
-    expect(called).to.equal(false)
-    input.simulate('focus')
-    expect(called).to.equal(true)
+    expect(focusHandler).toHaveBeenCalledTimes(0)
+    fireEvent.focus(screen.getByRole('checkbox'))
+    expect(focusHandler).toHaveBeenCalledTimes(1)
   })
 
-  it('tests toggle on touch with default unchecked', () => {
-    const wrapper = mount(
+  test('tests toggle on touch with default unchecked', () => {
+    render(
       <Toggle
         defaultChecked={false}
         onChange={noop}
       />,
     )
-    const toggleComp = wrapper.find('.react-toggle')
-    expect(wrapper.find('input')).to.not.be.checked()
-    toggleComp.simulate('touchStart', { changedTouches: [{ clientX: 30, clientY: 30 }] })
-    toggleComp.simulate('touchMove', { changedTouches: [{ clientX: 55, clientY: 30 }] })
-    toggleComp.simulate('touchEnd', { changedTouches: [{ clientX: 55, clientY: 30 }] })
 
-    expect(wrapper.find('input')).to.be.checked()
+    expect(screen.getByRole('checkbox')).not.toBeChecked()
+
+    const wrapper = screen.getByTestId('toggle-wrapper')
+    fireEvent.touchStart(wrapper, {
+      changedTouches: [{
+        clientX: 30,
+        clientY: 30,
+      }],
+    })
+
+    fireEvent.touchMove(wrapper, {
+      changedTouches: [{
+        clientX: 55,
+        clientY: 30,
+      }],
+    })
+
+    fireEvent.touchEnd(wrapper, {
+      changedTouches: [{
+        clientX: 55,
+        clientY: 30,
+      }],
+    })
+
+    expect(screen.getByRole('checkbox')).toBeChecked()
   })
 
-  it('tests toggle on touch with default checked', () => {
-    const wrapper = mount(
+  test('tests toggle on touch with default checked', () => {
+    render(
       <Toggle
         defaultChecked
         onChange={noop}
       />,
     )
 
-    const toggleComp = wrapper.find('.react-toggle')
-    expect(wrapper.find('input')).to.be.checked()
-    toggleComp.simulate('touchStart', { changedTouches: [{ clientX: 55, clientY: 30 }] })
-    toggleComp.simulate('touchMove', { changedTouches: [{ clientX: 30, clientY: 30 }] })
-    toggleComp.simulate('touchEnd', { changedTouches: [{ clientX: 30, clientY: 30 }] })
-    expect(wrapper.find('input')).to.not.be.checked()
-  })
+    expect(screen.getByRole('checkbox')).toBeChecked()
 
-  it('tests toggle on touch with pageXY', () => {
-    const wrapper = mount(
-      <Toggle
-        defaultChecked={false}
-        onChange={noop}
-      />,
-    )
-    const toggleComp = wrapper.find('.react-toggle')
-    expect(wrapper.find('input')).to.not.be.checked()
-    toggleComp.simulate('touchStart', { changedTouches: [], pageX: 30, pageY: 30 })
-    toggleComp.simulate('touchMove', { changedTouches: [], pageX: 55, pageY: 30 })
-    toggleComp.simulate('touchEnd', { changedTouches: [], pageX: 55, pageY: 30 })
-    expect(wrapper.find('input')).to.be.checked()
-    toggleComp.simulate('touchStart', { changedTouches: [], pageX: 55, pageY: 30 })
-    toggleComp.simulate('touchMove', { changedTouches: [], pageX: 30, pageY: 30 })
-    toggleComp.simulate('touchEnd', { changedTouches: [], pageX: 30, pageY: 30 })
-    expect(wrapper.find('input')).to.not.be.checked()
+    const wrapper = screen.getByTestId('toggle-wrapper')
+    fireEvent.touchStart(wrapper, {
+      changedTouches: [{
+        clientX: 55,
+        clientY: 30,
+      }],
+    })
+
+    fireEvent.touchMove(wrapper, {
+      changedTouches: [{
+        clientX: 30,
+        clientY: 30,
+      }],
+    })
+
+    fireEvent.touchEnd(wrapper, {
+      changedTouches: [{
+        clientX: 30,
+        clientY: 30,
+      }],
+    })
+
+    expect(screen.getByRole('checkbox')).not.toBeChecked()
   })
 })

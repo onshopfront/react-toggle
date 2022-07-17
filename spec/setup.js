@@ -1,3 +1,7 @@
+
+import '@testing-library/jest-dom'
+
+/*
 const { JSDOM } = require('jsdom')
 
 const jsdom = new JSDOM('<!doctype html><html><body></body></html>')
@@ -16,3 +20,4 @@ global.navigator = {
   userAgent: 'node.js',
 }
 copyProps(window, global)
+*/

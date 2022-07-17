@@ -8,6 +8,6 @@
     }]
   },
   "env": {
-    "mocha": true
+    "jest": true
   }
 }
